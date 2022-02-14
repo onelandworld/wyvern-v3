@@ -47,6 +47,7 @@ module.exports = {
       provider: function () {
         return new HDWalletProvider(rinkebyMnemonic, 'https://rinkeby.infura.io/v3/'+infuraKey)
       },
+      skipDryRun: true,
       from: '',
       port: 8545,
       network_id: '4',
