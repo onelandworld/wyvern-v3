@@ -14,8 +14,15 @@ var infuraKey = process.env.INFURA_KEY || '';
 var kasAccessKeyId = process.env.KAS_ACCESS_KEY_ID || ''
 var kasSecretAccessKey = process.env.KAS_SECRET_KEY || ''
 
+var etherscanKey = process.env.ETHERSCAN_KEY || ''
 
 module.exports = {
+  plugins: [
+    'truffle-plugin-verify'
+  ],
+  api_keys: {
+    etherscan: etherscanKey
+  },
   mocha: {
     enableTimeouts: false
   },

@@ -1,13 +1,14 @@
 {
   "deployed": {
     "rinkeby": {
-      "Migrations": "0x59851C99DFdD6b564840Bf762faA04a08CC947C9",
-      "WyvernAtomicizer": "0x4b989C43bb5283B19e6cF6C6cD85b1801B1b81F4",
-      "WyvernRegistry": "0x30caa00562AD2f2B41BB4b1943d28F84832ce0D6",
-      "WyvernExchange": "0xF40D3F036528Ed87b83748306c719757f22be4fE",
-      "WyvernStatic": "0x8Ee31C795d472a1d875621f0c4706B455011aD55",
+      "Migrations": "0xA174D789eAb094b71D3Dba224EbdCF4C7311aB83",
+      "WyvernAtomicizer": "0x5E6E0075B9600E74AA0214c6F3b98235922e750A",
+      "WyvernRegistry": "0xa16Cd54E5E111ad32a0e9065F7C85984fE2fE968",
+      "WyvernExchange": "0x3D7FA4926b8306714A62eA41fCf241a793AA255a",
+      "WyvernStatic": "0x5B0832f61b4951963C5A9bB60b209ca4f3BCa8A4",
       "TestERC20": "0x9aEEfb174928ac0c5b70949808Ec6E30ef4D439B",
-      "TestERC721": "0xa50bd876df59C35BE8fCe3FEd239DCe8C378a25f"
+      "TestERC721": "0xa50bd876df59C35BE8fCe3FEd239DCe8C378a25f",
+      "StaticMarket": "0x740A993dd3C2232ABC2F2926545FaB2955a20E71"
     },
     "mainnet": {
       "Migrations": "0x2020bc01065f82f1ACfAcD93671FF339bD65f322",
