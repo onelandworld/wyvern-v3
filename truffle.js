@@ -29,7 +29,7 @@ module.exports = {
   networks: {
     mainnet: {
       provider: function () {
-        return new HDWalletProvider(mainnetMnemonic, 'https://mainnet.infura.io')
+        return new HDWalletProvider(mainnetMnemonic, 'https://mainnet.infura.io/v3/'+infuraKey)
       },
       from: '',
       port: 8545,

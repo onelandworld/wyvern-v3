@@ -56,5 +56,17 @@ yarn analyze
 Edit [truffle.js](truffle.js) according to your deployment plans, then run:
 
 ```bash
+yarn --frozen-lockfile
 yarn run truffle deploy --network [network]
+```
+
+#### Etherscan Verify
+
+```bash
+yarn run truffle run verify Migrations@[address] --network [network] --debug
+yarn run truffle run verify WyvernAtomicizer@[address] --network [network] --debug
+yarn run truffle run verify WyvernRegistry@[address] --network [network] --debug
+yarn run truffle run verify WyvernExchange@[address] --network [network] --debug
+yarn run truffle run verify WyvernStatic@[address] --network [network] --debug
+yarn run truffle run verify StaticMarket@[address] --network [network] --debug
 ```
