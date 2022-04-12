@@ -32,7 +32,19 @@ yarn testrpc
 In a separate terminal, run the testuite:
 
 ```bash
-yarn test
+yarn test [./test/xxx.js]
+```
+
+or,
+
+```
+yarn run truffle test [--debug] [./test/xxx.js]
+```
+
+To debug a trasaction, run:
+
+```
+yarn run truffle debug [transaction hash]
 ```
 
 #### Linting
