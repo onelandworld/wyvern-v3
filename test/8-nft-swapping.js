@@ -191,29 +191,41 @@ contract('WyvernExchange', (accounts) => {
 		{
 			selectorOne = web3.eth.abi.encodeFunctionSignature('split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
 			// 	`split` extraData part 1 (staticCall of order)
-			const selectorOneA = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
-			const edParamsOneA = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
-			const edSelectorOneA = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
-			const extradataOneA = web3.eth.abi.encodeParameters(
+			const selectorA = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
+			const selectorA1 = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsA1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
+			const extradataA = web3.eth.abi.encodeParameters(
 				['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
-				[[wyvernStatic.address], [(edParamsOneA.length - 2) / 2], [edSelectorOneA], edParamsOneA]
+				[[wyvernStatic.address], [(edParamsA1.length - 2) / 2], [selectorA1], edParamsA1]
 			)
 
-			//	`split` extraData part 1 (staticCall of counter order)
-			const selectorOneB = web3.eth.abi.encodeFunctionSignature('sequenceAnyAfter(bytes,address[7],uint8,uint256[6],bytes)')
-			const edSelectorOneB1 = web3.eth.abi.encodeFunctionSignature('transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)')
-			const edParamsOneB1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc20.address, price])
-			const extradataOneB = web3.eth.abi.encodeParameters(
-				['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
-				[[wyvernStatic.address], [(edParamsOneB1.length - 2) / 2], [edSelectorOneB1], edParamsOneB1]
+			//	`split` extraData part 2 (staticCall of counter order)
+			const selectorB = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
+
+			const selectorB1 = web3.eth.abi.encodeFunctionSignature('transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsB1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc20.address, price])
+			const selectorB2 = web3.eth.abi.encodeFunctionSignature('transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsB2 = web3.eth.abi.encodeParameters(['address', 'uint256', 'address'], [erc20.address, fee, account_c])
+
+			const extradataB = web3.eth.abi.encodeParameters(
+				["address[]", "uint256[]", "bytes4[]", "bytes"],
+				[
+					[wyvernStatic.address, wyvernStatic.address],
+					[
+						(edParamsB1.length - 2) / 2,
+						(edParamsB2.length - 2) / 2
+					],
+					[selectorB1, selectorB2],
+					edParamsB1 + edParamsB2.slice("2")
+				]
 			)
 
 			// `split` extraData combined
 			extradataOne = web3.eth.abi.encodeParameters(
 				['address[2]', 'bytes4[2]', 'bytes', 'bytes'],
 				[[wyvernStatic.address, wyvernStatic.address],
-					[selectorOneA, selectorOneB],
-					extradataOneA, extradataOneB]
+					[selectorA, selectorB],
+					extradataA, extradataB]
 			)
 		}
 
@@ -243,7 +255,7 @@ contract('WyvernExchange', (accounts) => {
 				]
 			)
 
-			//	`split` extraData part 1 (staticCall of counter order)
+			//	`split` extraData part 2 (staticCall of counter order)
 			const selectorB = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
 			const edSelectorB1 = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
 			const edParamsB1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
