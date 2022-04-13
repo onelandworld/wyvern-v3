@@ -135,6 +135,7 @@ contract('WyvernExchange', (accounts) => {
 		assert.equal(token_owner, account_b,'Incorrect token owner')
 	})
 
+	// Ref: https://github.com/wyvernprotocol/wyvern-v3/issues/56
 	it('NFT: swap erc721 with splitted erc20 fee', async () => {
 		let {registry, exchange, atomicizer, wyvernStatic} = await deploy_core_contracts()
 		let [erc721,erc20] = await deploy([TestERC721,TestERC20])
@@ -143,7 +144,7 @@ contract('WyvernExchange', (accounts) => {
 		const account_b = accounts[6] // buyer
 		const account_c = accounts[1] // fee receipt (like oneland account)
 		const tokenId = 10
-		const price = 1000
+		const price = 800
 		/**
 		 * Expected behavior:
 		 * 	erc721:
@@ -162,8 +163,8 @@ contract('WyvernExchange', (accounts) => {
 		let proxy2 = await registry.proxies(account_b)
 		assert.equal(true, proxy2.length > 0, 'no proxy address for account b')
 		
-		await Promise.all([erc721.setApprovalForAll(proxy1,true,{from: account_a}),erc20.approve(proxy2,price,{from: account_b})])
-		await Promise.all([erc721.mint(account_a,tokenId),erc20.mint(account_b,price)])
+		await Promise.all([erc721.setApprovalForAll(proxy1,true,{from: account_a}),erc20.approve(proxy2,price+fee,{from: account_b})])
+		await Promise.all([erc721.mint(account_a,tokenId),erc20.mint(account_b,price+fee)])
 
 		const abi = [
 			{
@@ -185,37 +186,80 @@ contract('WyvernExchange', (accounts) => {
 		const erc721c = new web3.eth.Contract(erc721.abi, erc721.address)
 		const erc20c = new web3.eth.Contract(erc20.abi, erc20.address)
 
-		// first staticCall
-		const selectorOne = web3.eth.abi.encodeFunctionSignature('split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
-		// 	`split` extraData part 1 (staticCall of order)
-		const selectorOneA = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
-		const edParamsOneA = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
-		const edSelectorOneA = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
-		const extradataOneA = web3.eth.abi.encodeParameters(
-			['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
-			[[wyvernStatic.address], [(edParamsOneA.length - 2) / 2], [edSelectorOneA], edParamsOneA]
-		)
+		// order staticCall
+		let selectorOne, extradataOne
+		{
+			selectorOne = web3.eth.abi.encodeFunctionSignature('split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
+			// 	`split` extraData part 1 (staticCall of order)
+			const selectorOneA = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsOneA = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
+			const edSelectorOneA = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const extradataOneA = web3.eth.abi.encodeParameters(
+				['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
+				[[wyvernStatic.address], [(edParamsOneA.length - 2) / 2], [edSelectorOneA], edParamsOneA]
+			)
 
-		//	`split` extraData part 1 (staticCall of counter order)
-		const selectorOneB = web3.eth.abi.encodeFunctionSignature('sequenceAnyAfter(bytes,address[7],uint8,uint256[6],bytes)')
-		const edSelectorOneB1 = web3.eth.abi.encodeFunctionSignature('transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)')
-		const edParamsOneB1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc20.address, price - fee])
-		const extradataOneB = web3.eth.abi.encodeParameters(
-			['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
-			[[wyvernStatic.address], [(edParamsOneB1.length - 2) / 2], [edSelectorOneB1], edParamsOneB1]
-		)
+			//	`split` extraData part 1 (staticCall of counter order)
+			const selectorOneB = web3.eth.abi.encodeFunctionSignature('sequenceAnyAfter(bytes,address[7],uint8,uint256[6],bytes)')
+			const edSelectorOneB1 = web3.eth.abi.encodeFunctionSignature('transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsOneB1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc20.address, price])
+			const extradataOneB = web3.eth.abi.encodeParameters(
+				['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
+				[[wyvernStatic.address], [(edParamsOneB1.length - 2) / 2], [edSelectorOneB1], edParamsOneB1]
+			)
 
-		// `split` extraData combined
-		const extradataOne = web3.eth.abi.encodeParameters(
-			['address[2]', 'bytes4[2]', 'bytes', 'bytes'],
-			[[wyvernStatic.address, wyvernStatic.address],
-				[selectorOneA, selectorOneB],
-				extradataOneA, extradataOneB]
-		)
+			// `split` extraData combined
+			extradataOne = web3.eth.abi.encodeParameters(
+				['address[2]', 'bytes4[2]', 'bytes', 'bytes'],
+				[[wyvernStatic.address, wyvernStatic.address],
+					[selectorOneA, selectorOneB],
+					extradataOneA, extradataOneB]
+			)
+		}
 
-		// second staticCall
-		const selectorTwo = web3.eth.abi.encodeFunctionSignature('any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
-		const extradataTwo = '0x'
+		// counter order staticCall
+		let selectorTwo, extradataTwo
+		{
+			selectorTwo = web3.eth.abi.encodeFunctionSignature('split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
+
+			// 	`split` extraData part 1 (staticCall of order)
+			const selectorA = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
+
+			const selectorA1 = web3.eth.abi.encodeFunctionSignature('transferERC20Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsA1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc20.address, price])
+			const selectorA2 = web3.eth.abi.encodeFunctionSignature('transferERC20ExactTo(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsA2 = web3.eth.abi.encodeParameters(['address', 'uint256', 'address'], [erc20.address, fee, account_c])
+
+			const extradataA = web3.eth.abi.encodeParameters(
+				["address[]", "uint256[]", "bytes4[]", "bytes"],
+				[
+					[wyvernStatic.address, wyvernStatic.address],
+					[
+						(edParamsA1.length - 2) / 2,
+						(edParamsA2.length - 2) / 2
+					],
+					[selectorA1, selectorA2],
+					edParamsA1 + edParamsA2.slice("2")
+				]
+			)
+
+			//	`split` extraData part 1 (staticCall of counter order)
+			const selectorB = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edSelectorB1 = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsB1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
+			const extradataB = web3.eth.abi.encodeParameters(
+				['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
+				[[wyvernStatic.address], [(edParamsB1.length - 2) / 2], [edSelectorB1], edParamsB1]
+			)
+
+			// `split` extraData combined
+			extradataTwo = web3.eth.abi.encodeParameters(
+				['address[2]', 'bytes4[2]', 'bytes', 'bytes'],
+				[[wyvernStatic.address, wyvernStatic.address],
+					[selectorA, selectorB],
+					extradataA, extradataB]
+			)
+		}
 
 		// firstCall
 		const firstERC721Call = erc721c.methods.transferFrom(account_a, account_b, tokenId).encodeABI()
@@ -228,7 +272,7 @@ contract('WyvernExchange', (accounts) => {
 		const firstCall = {target: atomicizer.address, howToCall: 1, data: firstData}
 
 		// secondCall
-		const secondERC20CallA = erc20c.methods.transferFrom(account_b, account_a, price - fee).encodeABI()
+		const secondERC20CallA = erc20c.methods.transferFrom(account_b, account_a, price).encodeABI()
 		const secondERC20CallB = erc20c.methods.transferFrom(account_b, account_c, fee).encodeABI()
 		const secondData = atomicizerc.methods.atomicize(
 			[erc20.address, erc20.address],
@@ -247,7 +291,7 @@ contract('WyvernExchange', (accounts) => {
 		await exchange.atomicMatchWith(one, sigOne, firstCall, two, sigTwo, secondCall, ZERO_BYTES32,{from: account_b})
 		
 		let [account_a_erc20_balance, account_c_erc20_balance, token_owner] = await Promise.all([erc20.balanceOf(account_a),erc20.balanceOf(account_c),erc721.ownerOf(tokenId)])
-		assert.equal(account_a_erc20_balance.toNumber(), price - fee,'Incorrect ERC20 balance of account_a')
+		assert.equal(account_a_erc20_balance.toNumber(), price,'Incorrect ERC20 balance of account_a')
 		assert.equal(account_c_erc20_balance.toNumber(), fee,'Incorrect ERC20 balance of account_c')
 		assert.equal(token_owner, account_b,'Incorrect token owner')
 	})
