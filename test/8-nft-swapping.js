@@ -28,7 +28,7 @@ contract('WyvernExchange', (accounts) => {
 	let deploy = async contracts => Promise.all(contracts.map(contract => contract.new()))
 
 	it('NFT: swap erc721 with eth', async () => {
-		let {exchange, registry, staticMarket, wyvernStatic} = await deploy_core_contracts()
+		let {exchange, registry, atomicizer, staticMarket, wyvernStatic} = await deploy_core_contracts()
 		let [erc721] = await deploy([TestERC721])
 
 		const account_a = accounts[0]
@@ -47,21 +47,69 @@ contract('WyvernExchange', (accounts) => {
 		await Promise.all([erc721.setApprovalForAll(proxy1,true,{from: account_a})])
 		await Promise.all([erc721.mint(account_a,tokenId)])
 
-		const erc721c = new web3.eth.Contract(erc721.abi, erc721.address)
-		const selectorOne = web3.eth.abi.encodeFunctionSignature('anyAddOne(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
-		const selectorTwo = web3.eth.abi.encodeFunctionSignature('anyAddOne(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
-			
-		const paramsOne = '0x'
-		const paramsTwo = '0x'
-
-		const one = {registry: registry.address, maker: account_a, staticTarget: wyvernStatic.address, staticSelector: selectorOne, staticExtradata: paramsOne, maximumFill: 1, listingTime: '0', expirationTime: '10000000000', salt: '11'}
-		const two = {registry: registry.address, maker: account_b, staticTarget: wyvernStatic.address, staticSelector: selectorTwo, staticExtradata: paramsTwo, maximumFill: 1, listingTime: '0', expirationTime: '10000000000', salt: '12'}
-
-		const firstData = erc721c.methods.transferFrom(account_a, account_b, tokenId).encodeABI()
+		const abi = [
+			{
+				'constant': false, 
+				'inputs': [
+					{'name': 'addrs', 'type': 'address[]'},
+					{'name': 'values', 'type': 'uint256[]'},
+					{'name': 'calldataLengths', 'type': 'uint256[]'},
+					{'name': 'calldatas', 'type': 'bytes'}
+				],
+				'name': 'atomicize',
+				'outputs': [],
+				'payable': false,
+				'stateMutability': 'nonpayable',
+				'type': 'function'
+			}
+		]
+    const atomicizerc = new web3.eth.Contract(abi, atomicizer.address)
 		const wyvernStaticc = new web3.eth.Contract(wyvernStatic.abi, wyvernStatic.address)
+		const erc721c = new web3.eth.Contract(erc721.abi, erc721.address)
+
+		// order staticCall
+		let selectorOne, extradataOne
+		{
+			selectorOne = web3.eth.abi.encodeFunctionSignature('split(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
+			// 	`split` extraData part 1 (staticCall of order)
+			const selectorA = web3.eth.abi.encodeFunctionSignature('sequenceExact(bytes,address[7],uint8,uint256[6],bytes)')
+			const selectorA1 = web3.eth.abi.encodeFunctionSignature('transferERC721Exact(bytes,address[7],uint8,uint256[6],bytes)')
+			const edParamsA1 = web3.eth.abi.encodeParameters(['address', 'uint256'], [erc721.address, tokenId])
+			const extradataA = web3.eth.abi.encodeParameters(
+				['address[]', 'uint256[]', 'bytes4[]', 'bytes'],
+				[[wyvernStatic.address], [(edParamsA1.length - 2) / 2], [selectorA1], edParamsA1]
+			)
+
+			//	`split` extraData part 2 (staticCall of counter order)
+			const selectorB = web3.eth.abi.encodeFunctionSignature('test()')
+			const extradataB = '0x'
+
+			// `split` extraData combined
+			extradataOne = web3.eth.abi.encodeParameters(
+				['address[2]', 'bytes4[2]', 'bytes', 'bytes'],
+				[[wyvernStatic.address, wyvernStatic.address],
+					[selectorA, selectorB],
+					extradataA, extradataB]
+			)
+		}
+
+		const selectorTwo = web3.eth.abi.encodeFunctionSignature('any(bytes,address[7],uint8[2],uint256[6],bytes,bytes)')
+		const extradataTwo = '0x'
+
+		const one = {registry: registry.address, maker: account_a, staticTarget: wyvernStatic.address, staticSelector: selectorOne, staticExtradata: extradataOne, maximumFill: 1, listingTime: '0', expirationTime: '10000000000', salt: '11'}
+		const two = {registry: registry.address, maker: account_b, staticTarget: wyvernStatic.address, staticSelector: selectorTwo, staticExtradata: extradataTwo, maximumFill: 1, listingTime: '0', expirationTime: '10000000000', salt: '12'}
+
+		// firstCall
+		const firstERC721Call = erc721c.methods.transferFrom(account_a, account_b, tokenId).encodeABI()
+		const firstData = atomicizerc.methods.atomicize(
+			[erc721.address],
+			[0],
+			[(firstERC721Call.length - 2) / 2],
+			firstERC721Call
+		).encodeABI()
+		const firstCall = {target: atomicizer.address, howToCall: 1, data: firstData}
+
 		const secondData = wyvernStaticc.methods.test().encodeABI()
-		
-		const firstCall = {target: erc721.address, howToCall: 0, data: firstData}
 		const secondCall = {target: wyvernStatic.address, howToCall: 0, data: secondData}
 
 		let [initBalanceA, initBalanceB] = await Promise.all([web3.eth.getBalance(account_a), web3.eth.getBalance(account_b)])
