@@ -1,35 +1,20 @@
 {
   "deployed": {
     "rinkeby": {
-      "Migrations": "0x7E5Fc0207Bd8d233B76000053664a8eb409595D9",
-      "WyvernAtomicizer": "0xC84700C0eBB7f8a5eEBA0c4f02B204E033cDf3ea",
-      "WyvernRegistry": "0xD6f76d57096a34BDde26439e527A3cD352b90514",
-      "WyvernExchange": "0xdbA0897Ae390f0A0ceA0c9232aE186A5eB5525c6",
-      "WyvernStatic": "0x19A9aFF1f4A5c1Add727099E56c5a62b492443c2",
-      "StaticMarket": "0x33C331591c8233727050029FbB3bF72D60CB66B1"
+      "Migrations": "0xF621f1dD02D8E83cd89fE05E788c731617560451",
+      "WyvernAtomicizer": "0xfc9db70B2B3C65A4F7e3fBC1a10925b5fE4450e7",
+      "WyvernRegistry": "0x92C64C093B624ea1A0F63831461470D84b5666E1",
+      "WyvernExchange": "0xEbB48Bf24BbdF0A5Bb6A9DDac7D3888ED023b453",
+      "WyvernStatic": "0x521DBC611f1d1290B01f15092bc4D8bE2f951f82",
+      "StaticMarket": "0xD1205Be6C66a4f450f1E0809020da99433138bA5"
     },
     "mainnet": {
-      "Migrations": "0x2020bc01065f82f1ACfAcD93671FF339bD65f322",
-      "WyvernAtomicizer": "0x63A983B3cbb719024d4203A636118Ea899d14d2a",
-      "WyvernStatic": "0x32Ce15F191aFD85072A594f388A78D3f6Bf6a9Bf",
-      "WyvernRegistry": "0xa5409ec958C83C3f309868babACA7c86DCB077c1",
-      "WyvernExchange": "0xd7CA74fF003c90E62505D21ec7Dac36bCfD9F6f2"
-    },
-    "mumbai": {
-      "Migrations": "0x6C9497bf4700c296F5Cd7031158501410040aA8A",
-      "WyvernAtomicizer": "0x9f0B24C426327ff824f999c0507943c8bda9F674",
-      "WyvernStatic": "0x2A20127Bf55aA3fbEe8E8831CCF012d1dF470B74",
-      "WyvernRegistry": "0x2a9BbBd5db91a30C2b295Bd07b8122036236BF13",
-      "WyvernExchange": "0xE4249006405365590882D4e6b3c23746252c4d1d",
-      "StaticMarket": "0xCaB85B878296B9F00c12682b2C14c281A7DBb6a5"
-    },
-    "baobab": {
-      "Migrations": "0x294C849D78cc08457bdc3278f751789e2B2BEf5c",
-      "WyvernAtomicizer": "0xe6c0ee1209a1Dbe4A406799e9D63f1Be606CfE3E",
-      "WyvernStatic": "0xd074EbBf82806095eC784e7E00C2a44196868C4F",
-      "StaticMarket": "0xa86AF1A5bB8AF2418500AAbdacB9B7d2217F91A5",
-      "WyvernRegistry": "0x23d0a64aF6987A2d536B9c3bA72FAAf66c9D73b6",
-      "WyvernExchange": "0xDBA99cE125C6140dC4b30D48cBdDc57Bc67dc2d1"
+      "Migrations": "0x365ad15035B343b7dd8F22030DfC1a75AF3dB81F",
+      "WyvernAtomicizer": "0xfD73bB171F13d89905846cfC7A34cE70F3B84214",
+      "WyvernStatic": "0x7A3e9DDEb274792170A683B658725Ddf3Bb0BD85",
+      "WyvernRegistry": "0x0d98fC45dCCCbd4D56F8E8Bb233FcD7Dda6224B8",
+      "WyvernExchange": "0xd188E5D1aB946b47436794f6477F84fEe6C54CB6",
+      "StaticMarket": "0x13bc0C61b19Ea920b14AfC1b8c704f2242771DF7"
     }
   }
 }

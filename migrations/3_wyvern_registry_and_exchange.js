@@ -8,8 +8,10 @@ const chainIds = {
   development: 50,
   coverage: 50,
   rinkeby: 4,
+  'rinkeby-fork': 4, // for truffle deployment dryrun
   mumbai: 80001,
-  main: 1
+  mainnet: 1,
+  'mainnet-fork': 1 // for truffle deployment dryrun
 }
 
 const personalSignPrefixes = {

@@ -34,7 +34,8 @@ module.exports = {
       from: '',
       port: 8545,
       network_id: '1',
-      gasPrice: 4310000000,
+      gas: 8000000,
+      gasPrice: 50000000000,
       confirmations: 2
     },
     development: {
@@ -54,7 +55,6 @@ module.exports = {
       provider: function () {
         return new HDWalletProvider(rinkebyMnemonic, 'https://rinkeby.infura.io/v3/'+infuraKey)
       },
-      skipDryRun: true,
       from: '',
       port: 8545,
       network_id: '4',
