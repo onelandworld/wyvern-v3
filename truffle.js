@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-var HDWalletProvider = require('truffle-hdwallet-provider')
+var HDWalletProvider = require("@truffle/hdwallet-provider")
 var KlaytnHDWalletProvider = require('truffle-hdwallet-provider-klaytn')
 var Caver = require('caver-js')
 
@@ -15,13 +15,15 @@ var kasAccessKeyId = process.env.KAS_ACCESS_KEY_ID || ''
 var kasSecretAccessKey = process.env.KAS_SECRET_KEY || ''
 
 var etherscanKey = process.env.ETHERSCAN_KEY || ''
+var polygonscanKey = process.env.POLYGONSCAN_KEY || ''
 
 module.exports = {
   plugins: [
     'truffle-plugin-verify'
   ],
   api_keys: {
-    etherscan: etherscanKey
+    etherscan: etherscanKey,
+    polygonscan: polygonscanKey
   },
   mocha: {
     enableTimeouts: false
@@ -53,7 +55,7 @@ module.exports = {
     },
     rinkeby: {
       provider: function () {
-        return new HDWalletProvider(rinkebyMnemonic, 'https://rinkeby.infura.io/v3/'+infuraKey)
+        return new HDWalletProvider(rinkebyMnemonic, `https://rinkeby.infura.io/v3/${infuraKey}`)
       },
       from: '',
       port: 8545,
@@ -65,10 +67,21 @@ module.exports = {
     },
     mumbai: {
       provider: function () {
-        return new HDWalletProvider(mumbaiMnemonic, 'https://rpc-mumbai.matic.today')
+        return new HDWalletProvider(mumbaiMnemonic, `https://polygon-mumbai.infura.io/v3/${infuraKey}`)
       },
       from: '',
-      network_id: '80001'
+      network_id: '80001',
+      timeoutBlocks: 200,
+      confirmations: 2
+    },
+    matic: {
+      provider: function () {
+        return new HDWalletProvider(mumbaiMnemonic, 'https://rpc-mainnet.matic.network')
+      },
+      from: '',
+      network_id: '137',
+      timeoutBlocks: 200,
+      confirmations: 2
     },
     baobab: {
       provider: () => {

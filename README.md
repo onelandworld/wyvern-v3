@@ -69,7 +69,7 @@ Edit [truffle.js](truffle.js) according to your deployment plans, then run:
 
 ```bash
 yarn --frozen-lockfile
-yarn run truffle deploy --network [mainnet/rinkeby/...]
+yarn run truffle deploy --network [mainnet/rinkeby/mumbai/...]
 ```
 
 #### Etherscan Verify
