@@ -23,6 +23,14 @@
       "StaticMarket": "0x740A993dd3C2232ABC2F2926545FaB2955a20E71",
       "WyvernRegistry": "0xa16Cd54E5E111ad32a0e9065F7C85984fE2fE968",
       "WyvernExchange": "0x3D7FA4926b8306714A62eA41fCf241a793AA255a"
+    },
+    "bsctestnet": {
+      "Migrations": "0xfb1CA1f7b9e16198830FE2c83D73184f57D59cce",
+      "WyvernAtomicizer": "0x3763F59D691200d2efC9B895B4f26Cd3Ec394CFD",
+      "WyvernStatic": "0x73cd868bAc82b57f1a1477B5932c20914C170F89",
+      "StaticMarket": "0x3f0A65b5B7E951a49AE2f211629B401F73f88169",
+      "WyvernRegistry": "0xF9B9596510d02E5cF543BA8943aD77b452379652",
+      "WyvernExchange": "0x66f17F6A34A8521F6AF4C9C6B0dBE2d116d75445"
     }
   }
 }

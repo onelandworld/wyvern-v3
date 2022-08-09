@@ -12,7 +12,9 @@ const chainIds = {
   mainnet: 1,
   'mainnet-fork': 1, // for truffle deployment dryrun
   mumbai: 80001,
-  matic: 137
+  matic: 137,
+  bsctestnet: 97,
+  bsc: 56
 }
 
 const personalSignPrefixes = {

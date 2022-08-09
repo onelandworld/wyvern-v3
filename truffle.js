@@ -7,6 +7,7 @@ var Caver = require('caver-js')
 var rinkebyMnemonic = process.env.RINKEBY_MNEMONIC || ''
 var mumbaiMnemonic = process.env.MUMBAI_MNEMONIC || ''
 var mainnetMnemonic = process.env.MAINNET_MNEMONIC || ''
+var bscMnemonic = process.env.BSC_MNEMONIC || ''
 var klaytnPrivateKey = process.env.KLAYTN_PRIVATE_KEY || ''
 var baobabPrivateKey = process.env.BAOBAB_PRIVATE_KEY || ''
 var infuraKey = process.env.INFURA_KEY || '';
@@ -16,6 +17,7 @@ var kasSecretAccessKey = process.env.KAS_SECRET_KEY || ''
 
 var etherscanKey = process.env.ETHERSCAN_KEY || ''
 var polygonscanKey = process.env.POLYGONSCAN_KEY || ''
+var bscscanKey = process.env.BSCSCAN_KEY || ''
 
 module.exports = {
   plugins: [
@@ -23,7 +25,8 @@ module.exports = {
   ],
   api_keys: {
     etherscan: etherscanKey,
-    polygonscan: polygonscanKey
+    polygonscan: polygonscanKey,
+    bscscan: bscscanKey
   },
   mocha: {
     enableTimeouts: false
@@ -116,7 +119,21 @@ module.exports = {
       networkCheckTimeout: 10000,
       gas: '8500000',
       gasPrice:'25000000000'
-    }
+    },
+    bsctestnet: {
+      provider: () => new HDWalletProvider(bscMnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    bsc: {
+      provider: () => new HDWalletProvider(bscMnemonic, `https://bsc-dataseed1.binance.org`),
+      network_id: 56,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
   },
   compilers: {
     solc: {
